@@ -16,10 +16,11 @@ model User {
   email         String   @unique
   name          String
   password_hash String
+  plan          String   @default("free") // Campo do plano de monetização
   documents     Document[] // Relação: Um usuário pode ter vários documentos
 }
 
-// NOVO Modelo de Documento
+// Modelo de Documento
 model Document {
   id            Int      @id @default(autoincrement())
   type          String   // "resume" ou "cover_letter"
@@ -31,4 +32,23 @@ model Document {
   // Relação com o usuário (Chave estrangeira)
   owner         User     @relation(fields: [ownerId], references: [id])
   ownerId       Int      // Campo que armazena o ID do usuário dono
+
+  // --- CAMPOS DE COMPARTILHAMENTO ATUALIZADOS ---
+  isPublic      Boolean  @default(false)
+  // CORREÇÃO: Renomeado de 'publicUrl' para 'publicId' e tornado @unique
+  publicId      String?  @unique // URL pública única, se aplicável
+
+  // --- RELAÇÃO COM ANALYTICS ---
+  // Um documento pode ter vários eventos de visualização
+  views         ViewEvent[]
+}
+
+// --- NOVO MODELO PARA ANALYTICS ---
+model ViewEvent {
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime @default(now())
+  
+  // Relação com o documento que foi visto
+  document  Document @relation(fields: [documentId], references: [id])
+  documentId Int
 }
