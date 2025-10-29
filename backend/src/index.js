@@ -61,7 +61,72 @@ app.get('/', (req, res) => {
 
 // --- Rotas de Autenticação ---
 const authRouter = express.Router();
-// ... (POST /register e POST /login como antes) ...
+
+// --- INÍCIO DAS ROTAS RESTAURADAS ---
+// POST /api/register
+authRouter.post('/register', async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password)
+    return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios." });
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password_hash: hashedPassword,
+      },
+    });
+
+    res.status(201).json({ message: "Usuário registrado com sucesso!", user: { id: newUser.id, name: newUser.name, email: newUser.email } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return res.status(400).json({ error: "E-mail já está em uso." });
+    }
+    console.error("Erro ao registrar:", error);
+    res.status(500).json({ error: "Erro interno ao registrar usuário." });
+  }
+});
+
+// POST /api/login
+authRouter.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return res.status(400).json({ error: "E-mail e senha são obrigatórios." });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user)
+      return res.status(401).json({ error: "Credenciais inválidas." });
+
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword)
+      return res.status(401).json({ error: "Credenciais inválidas." });
+
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    res.status(200).json({
+      message: "Login bem-sucedido!",
+      token,
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan },
+    });
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    res.status(500).json({ error: "Erro interno ao fazer login." });
+  }
+});
+// --- FIM DAS ROTAS RESTAURADAS ---
+
+// Monta o roteador de autenticação no prefixo /api
 app.use('/api', authRouter);
 
 // --- Rotas de Documentos (Protegidas) ---
@@ -147,47 +212,24 @@ documentRouter.patch('/:id/share', async (req, res) => {
   }
 });
 
-// --- INÍCIO DA NOVA ROTA DE ANALYTICS ---
-// GET /api/documents/:id/analytics (Busca dados de visualização)
+// GET /api/documents/:id/analytics
 documentRouter.get('/:id/analytics', async (req, res) => {
   const { id } = req.params;
-
   try {
-    // 1. Verifica se o documento pertence ao usuário
     const document = await prisma.document.findUnique({
-      where: {
-        id: parseInt(id),
-        ownerId: req.user.userId, // Garante que o usuário só veja analytics dos seus docs
-      },
-      select: { id: true } // Só precisamos confirmar que existe
+      where: { id: parseInt(id), ownerId: req.user.userId },
+      select: { id: true }
     });
-
-    if (!document) {
-      return res.status(404).json({ error: "Documento não encontrado ou não pertence a você." });
-    }
-
-    // 2. Conta os eventos de visualização para esse documento
+    if (!document) return res.status(404).json({ error: "Documento não encontrado ou não pertence a você." });
     const viewCount = await prisma.viewEvent.count({
-      where: {
-        documentId: parseInt(id),
-      },
+      where: { documentId: parseInt(id) },
     });
-
-    // (Futuramente, podemos buscar dados mais complexos aqui, como views por dia)
-
-    // 3. Retorna os dados
-    res.json({
-      documentId: parseInt(id),
-      totalViews: viewCount,
-      // ... (outros dados analíticos podem ser adicionados aqui)
-    });
-
+    res.json({ documentId: parseInt(id), totalViews: viewCount });
   } catch (error) {
     console.error("Erro ao buscar analytics:", error);
     res.status(500).json({ error: "Erro ao buscar dados de analytics." });
   }
 });
-// --- FIM DA NOVA ROTA DE ANALYTICS ---
 
 // Monta o roteador de documentos no prefixo /api/documents
 app.use('/api/documents', authenticateToken, documentRouter);
