@@ -46,7 +46,8 @@ Esta seção detalha as decisões técnicas complexas tomadas durante o desenvol
     Foi implementado um pipeline de dados assíncrono para a funcionalidade de analytics. Quando a rota pública (`/api/public/resume/:publicId`) é acessada, ela **não espera** o banco de dados escrever o `ViewEvent`. O registro é disparado de forma assíncrona para garantir que o currículo seja entregue ao recrutador com a **menor latência possível**, enquanto o evento de análise é processado em segundo plano.
 
 * **Produtividade (IA como Pair Programming):**
-    Este projeto foi construído rapidamente atuando como Arquiteto de Soluções. Defini a estrutura de dados (Prisma), as rotas da API e a lógica de estado (Pinia). Utilizei ferramentas de IA (Gemini) como "parceiro de programação" para acelerar a escrita de código-base, permitindo-me focar no trabalho de nível sênior: **integração, debug e garantia da qualidade da arquitetura.**
+    Este projeto foi construído rapidamente atuando como Arquiteto de Soluções. Defini a estrutura de dados (Prisma), as rotas da API e a lógica de estado (Pinia). Utilizei ferramentas de IA (Gemini) como "parceiro de programação" para acelerar a escrita de código-base, permitindo-me focar no trabalho:
+     **integração, debug e garantia da qualidade da arquitetura.**
 
 ---
 
