@@ -1,27 +1,21 @@
 import jwt from 'jsonwebtoken';
 
 function authenticateToken(req, res, next) {
-  // Pega o token do cabeçalho 'Authorization' (formato: "Bearer TOKEN")
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
   if (token == null) {
-    // Se não há token, retorna erro 401 (Não Autorizado)
-    return res.sendStatus(401); 
+    return res.status(401).json({ error: "Token não fornecido." });
   }
 
-  // Verifica se o token é válido e não expirou
-  jwt.verify(token, process.env.JWT_SECRET, (err, userPayload) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      // Se o token for inválido (ou expirado), retorna erro 403 (Proibido)
-      return res.sendStatus(403); 
+      return res.status(403).json({ error: "Token inválido." }); // 403 Forbidden
     }
-
-    // Se o token for válido, adiciona as informações do usuário (payload do token) ao objeto `req`
-    req.user = userPayload; 
-
-    // Passa para a próxima função (a rota principal)
-    next(); 
+    
+    // Anexa o payload do utilizador (que contém { userId: ... }) ao request
+    req.user = user;
+    next();
   });
 }
 
