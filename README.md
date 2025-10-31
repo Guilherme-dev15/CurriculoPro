@@ -1,6 +1,6 @@
 # 🚀 CurriculoPro - SaaS de Criação de Currículos com Analytics
 
-[COLOQUE SEU GIF DE NAVEGAÇÃO AQUI - FICA PERFEITO NO TOPO]
+![CurriculoPro](https://github.com/user-attachments/assets/84cfd0cf-f706-4e04-8e54-f406b5eb7715)
 
 O CurriculoPro é uma aplicação web full-stack (microSaaS) que permite aos utilizadores criar, gerir, partilhar e analisar currículos de forma profissional.
 
