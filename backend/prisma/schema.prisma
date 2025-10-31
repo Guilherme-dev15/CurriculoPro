@@ -6,49 +6,44 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL") // Lê do arquivo .env
+  provider = "sqlite" // Ou "postgresql", "mysql", etc.
+  url      = env("DATABASE_URL")
 }
 
-// Modelo de Usuário atualizado
+// Modelo de Utilizador (User)
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  name          String
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  name          String?
   password_hash String
-  plan          String   @default("free") // Campo do plano de monetização
-  documents     Document[] // Relação: Um usuário pode ter vários documentos
+  plan          String     @default("free") // 'free' ou 'pro'
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  documents     Document[] // Relação: Um utilizador tem muitos documentos
 }
 
-// Modelo de Documento
+// Modelo de Documento (Currículo/Carta)
 model Document {
-  id            Int      @id @default(autoincrement())
-  type          String   // "resume" ou "cover_letter"
-  name          String
-  data          Json     // Armazenará o JSON completo dos dados do currículo/carta
-  lastModified  DateTime @updatedAt // Atualiza automaticamente a cada alteração
-  createdAt     DateTime @default(now()) // Define a data de criação automaticamente
+  id           Int          @id @default(autoincrement())
+  type         String // "resume" ou "cover_letter"
+  name         String
+  data         Json // Os dados do currículo (JSON)
+  isPublic     Boolean      @default(false)
+  publicId     String?      @unique // ID para partilha pública (nanoid)
+  lastModified DateTime     @default(now()) @updatedAt
+  owner        User         @relation(fields: [ownerId], references: [id])
+  ownerId      Int // Chave estrangeira para User
+  viewEvents   ViewEvent[] // Relação: Um documento tem muitos eventos de visualização
 
-  // Relação com o usuário (Chave estrangeira)
-  owner         User     @relation(fields: [ownerId], references: [id])
-  ownerId       Int      // Campo que armazena o ID do usuário dono
-
-  // --- CAMPOS DE COMPARTILHAMENTO ATUALIZADOS ---
-  isPublic      Boolean  @default(false)
-  // CORREÇÃO: Renomeado de 'publicUrl' para 'publicId' e tornado @unique
-  publicId      String?  @unique // URL pública única, se aplicável
-
-  // --- RELAÇÃO COM ANALYTICS ---
-  // Um documento pode ter vários eventos de visualização
-  views         ViewEvent[]
+  @@index([ownerId]) // Index para otimizar a busca de documentos por utilizador
 }
 
-// --- NOVO MODELO PARA ANALYTICS ---
+// Modelo de Evento de Visualização (Analytics)
 model ViewEvent {
-  id        Int      @id @default(autoincrement())
-  timestamp DateTime @default(now())
-  
-  // Relação com o documento que foi visto
-  document  Document @relation(fields: [documentId], references: [id])
-  documentId Int
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime @default(now())
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId Int // Chave estrangeira para Document
+
+  @@index([documentId]) // Index para otimizar a contagem de views
 }
