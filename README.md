@@ -27,7 +27,7 @@ O resultado é uma aplicação Full-Stack 100% funcional. O pipeline de analytic
 
 ---
 
-## 2. 🏛️ Pontos-Chave da Arquitetura (Meu Roteiro para a Entrevista)
+## 2. 🏛️ Pontos-Chave da Arquitetura 
 
 Esta é a seção mais importante para a sua entrevista de React Pleno. Use-a para guiar a conversa.
 
