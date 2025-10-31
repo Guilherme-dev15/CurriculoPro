@@ -1,14 +1,12 @@
 # 🚀 CurriculoPro - SaaS de Criação de Currículos com Analytics
 
-[COLOQUE SEU GIF DE NAVEGAÇÃO AQUI - FICA PERFEITO NO TOPO]
+![CurriculoPro](https://github.com/user-attachments/assets/84cfd0cf-f706-4e04-8e54-f406b5eb7715)
 
-O CurriculoPro é uma aplicação web full-stack (microSaaS) que permite aos utilizadores criar, gerir, compartilhar e analisar currículos de forma profissional.
+O CurriculoPro é uma aplicação web full-stack (micro-SaaS) que permite aos utilizadores criar, gerir, partilhar e analisar currículos de forma profissional.
 
 ---
 
-## 1. 🎯 O Estudo de Caso (Por que este projeto existe?)
-
-Esta seção transforma o projeto de "apenas código" para uma "solução de negócio", provando o pensamento de nível Sênior.
+## 1. 🎯 O Estudo de Caso (O "Porquê")
 
 ### O Problema
 Eu identifiquei dois grandes problemas no mercado de busca de emprego.
@@ -16,32 +14,39 @@ Eu identifiquei dois grandes problemas no mercado de busca de emprego.
 1.  **A Dor do Usuário:** Para a maioria dos candidatos, criar um currículo é um processo frustrante e demorado. Ferramentas tradicionais são complexas e não oferecem orientação, resultando em documentos mal estruturados.
 2.  **O Problema Técnico (ATS):** A maioria dos currículos feitos manualmente não é otimizada para os sistemas de triagem (ATS), fazendo com que bons candidatos sejam automaticamente descartados pelos "algoritmos".
 
-### A Solução (A Engenharia)
-Para resolver isso, idealizei e construí o **CurriculoPro** como um micro-SaaS:
+### A Solução (Produto e Engenharia)
+Para resolver isso, idealizei e construí o **CurriculoPro** como um micro-SaaS, atacando o problema em duas frentes:
 
-1.  **Para o Usuário (O Produto):** Criei um editor de currículo dinâmico em **Vue.js** que guia o usuário por seções pré-estruturadas. A plataforma gera um link de compartilhamento público e fornece **analytics**, permitindo ao candidato saber *quantas vezes* seu currículo foi visualizado.
-2.  **Para o Recrutador (A Engenharia):** Por trás da interface, construí uma API robusta em **Node.js** com Prisma. A arquitetura foi refatorada de um monolito para ser **100% modular (Rotas, Controladores, Middlewares)**, garantindo segurança (JWT), escalabilidade e um código de fácil manutenção.
+1.  **Produto (A Experiência do Usuário):**
+    Criei um editor de currículo dinâmico e intuitivo em **Vue.js** que guia o usuário por seções pré-estruturadas. A plataforma gera um link de compartilhamento público e fornece **analytics**, permitindo ao candidato saber *quantas vezes* seu currículo foi visualizado.
+
+2.  **Engenharia (A Arquitetura):**
+    Por trás da interface simples, construí uma API robusta em **Node.js** com Prisma. A arquitetura foi refatorada de um monolito para ser **100% modular (Rotas, Controladores, Middlewares)**, garantindo segurança (JWT), escalabilidade e um código de fácil manutenção.
 
 ### O Resultado
 O resultado é uma aplicação Full-Stack 100% funcional. O pipeline de analytics coleta dados de visualização com sucesso, e a arquitetura modular prova a capacidade de construir sistemas escaláveis e prontos para o mercado.
 
 ---
 
-## 2. 🏛️ Pontos-Chave da Arquitetura 
+## 2. 🏛️ Decisões Chave de Arquitetura
 
-Esta é a seção mais importante para a sua entrevista de React Pleno. Use-a para guiar a conversa.
+Esta seção detalha as decisões técnicas complexas tomadas durante o desenvolvimento.
 
-* **Vaga pede:** `Arquitetura` e `Microfrontends`
-    * **Meu projeto prova:** A refatoração do back-end de um arquivo único para uma **arquitetura modular** (Rotas, Controladores, Middlewares, Serviços) demonstra meu entendimento de separação de responsabilidades (SoC), que é o pilar fundamental dos Microfrontends e Microserviços.
+* **Arquitetura de Back-end Modular:**
+    O back-end foi intencionalmente refatorado de um único arquivo monolítico para uma arquitetura modular (separando Rotas, Controladores, Middlewares e Serviços). Esta abordagem demonstra o entendimento de **Separação de Responsabilidades (SoC)**, que é o pilar fundamental para criar sistemas escaláveis, testáveis e de fácil manutenção, aplicando os mesmos princípios de design de Microserviços.
 
-* **Vaga pede:** `Redux / Redux Saga`
-    * **Meu projeto prova:** Eu dominei o **Pinia** (o sucessor oficial do Vuex). Conceitualmente, é idêntico ao Redux: é uma store global, com *actions* (para mutações assíncronas), *state* (o estado) e *getters* (os seletores). Eu o utilizei para gerenciar o estado de autenticação (JWT, dados do usuário) e o estado dos documentos (lista, documento ativo). A curva de aprendizado para o Redux é mínima, pois já domino os conceitos.
+* **Gestão de Estado Global (Pinia):**
+    O projeto utiliza **Pinia** (o sucessor oficial do Vuex) para gestão de estado global. Os conceitos são 100% transferíveis para ecossistemas como Redux:
+    1.  **State:** Gerencia o estado de autenticação (JWT, dados do usuário).
+    2.  **Actions:** Lida com todas as mutações assíncronas (login, fetch de documentos, etc.).
+    3.  **Getters:** Expõe dados computados (ex: `isAuthenticated`).
+    Isso prova o domínio sobre gerenciamento de estado complexo e reatividade.
 
-* **Vaga pede:** `Experiência Pleno`
-    * **Meu projeto prova:** Eu criei um **pipeline de dados assíncrono** para a funcionalidade de analytics. Quando a rota pública (`/api/public/resume/:publicId`) é acessada, ela **não espera** o banco de dados escrever o `ViewEvent`. Ela faz isso de forma assíncrona para garantir que o currículo seja entregue ao recrutador com a menor latência possível, enquanto o evento é registrado em segundo plano.
+* **Pipeline de Analytics Assíncrono:**
+    Foi implementado um pipeline de dados assíncrono para a funcionalidade de analytics. Quando a rota pública (`/api/public/resume/:publicId`) é acessada, ela **não espera** o banco de dados escrever o `ViewEvent`. O registro é disparado de forma assíncrona para garantir que o currículo seja entregue ao recrutador com a **menor latência possível**, enquanto o evento de análise é processado em segundo plano.
 
-* **Produtividade (A "Carta na Manga"):**
-    * Este projeto foi construído rapidamente porque atuei como **Arquiteto de Soluções**. Defini a estrutura de dados (Prisma), as rotas da API e a lógica de estado (Pinia). Usei ferramentas de IA (Gemini) como meu "programador júnior" para acelerar a escrita do código-base, enquanto eu foquei no trabalho de nível sênior: **integração, debug e garantia da qualidade da arquitetura.**
+* **Produtividade (IA como Pair Programming):**
+    Este projeto foi construído rapidamente atuando como Arquiteto de Soluções. Defini a estrutura de dados (Prisma), as rotas da API e a lógica de estado (Pinia). Utilizei ferramentas de IA (Gemini) como "parceiro de programação" para acelerar a escrita de código-base, permitindo-me focar no trabalho de nível sênior: **integração, debug e garantia da qualidade da arquitetura.**
 
 ---
 
@@ -144,7 +149,7 @@ Esta é a seção mais importante para a sua entrevista de React Pleno. Use-a pa
 
 ---
 
-## 6. 🛣️ Roadmap Futuro (Pendências)
+## 6. 🛣️ Roadmap Futuro
 
 O projeto está 100% funcional. Os próximos passos focam em polimento de UX e novas features:
 * **[UX]** Substituir todos os `alert()` e `confirm()` por um `ConfirmModal.vue` reutilizável.
