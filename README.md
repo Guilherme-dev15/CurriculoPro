@@ -2,7 +2,7 @@
 
 [COLOQUE SEU GIF DE NAVEGAÇÃO AQUI - FICA PERFEITO NO TOPO]
 
-O CurriculoPro é uma aplicação web full-stack (microSaaS) que permite aos utilizadores criar, gerir, partilhar e analisar currículos de forma profissional.
+O CurriculoPro é uma aplicação web full-stack (microSaaS) que permite aos utilizadores criar, gerir, compartilhar e analisar currículos de forma profissional.
 
 ---
 
